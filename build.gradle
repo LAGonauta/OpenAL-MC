@@ -23,6 +23,10 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 }
 
+minecraft {
+   	accessWidener "src/main/resources/openalmc.accesswidener"
+}
+
 processResources {
 	inputs.property "version", project.version
 

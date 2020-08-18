@@ -1,0 +1,14 @@
+accessWidener v1 named
+
+accessible class net/minecraft/client/sound/SoundEngine$SourceSet
+accessible class net/minecraft/client/sound/SoundEngine$SourceSetImpl
+accessible field net/minecraft/client/sound/SoundEngine$SourceSetImpl maxSourceCount I
+accessible field net/minecraft/client/sound/SoundEngine$SourceSetImpl sources Ljava/util/Set;
+
+extendable method net/minecraft/client/sound/Source <init> (I)V
+accessible method net/minecraft/client/sound/Source <init> (I)V
+accessible method net/minecraft/client/sound/Source getBufferSize (Ljavax/sound/sampled/AudioFormat;I)I
+accessible method net/minecraft/client/sound/Source method_19640 (I)V
+
+accessible field net/minecraft/client/sound/Source bufferSize I
+accessible field net/minecraft/client/sound/Source stream Lnet/minecraft/client/sound/AudioStream;

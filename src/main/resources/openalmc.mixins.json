@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "net.openalmc.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MixinAl",
+    "MixinAlUtilInvoker",
+    "MixinSourceInvoker",
+    "MixinSource",
+    "MixinSoundEngine",
+    "MixinSourceSet",
+    "MixinSoundSystem"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

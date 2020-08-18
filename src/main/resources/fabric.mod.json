@@ -1,30 +1,35 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "openalmc",
   "version": "${version}",
 
-  "name": "Example Mod",
+  "name": "OpenAL MC",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
-    "Me!"
+    "LAGonauta"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/LAGonauta/OpenAL-MC",
+    "sources": "https://github.com/LAGonauta/OpenAL-MC"
   },
 
-  "license": "CC0-1.0",
+  "license": "GPLv3",
   "icon": "assets/modid/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
-    "main": [
-      "net.fabricmc.example.ExampleMod"
+    "client": [
+      "net.openalmc.OpenALMCMod"
+    ],
+    "gfh:prePreLaunch": [
+      "net.openalmc.OpenALMCPrePreLaunch"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "openalmc.mixins.json"
   ],
+
+  "accessWidener" : "openalmc.accesswidener",
 
   "depends": {
     "fabricloader": ">=0.7.4",
@@ -32,6 +37,6 @@
     "minecraft": "1.16.x"
   },
   "suggests": {
-    "flamingo": "*"
+    "modmenu": "*"
   }
 }
