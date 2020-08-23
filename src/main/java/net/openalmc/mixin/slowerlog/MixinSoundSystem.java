@@ -1,4 +1,4 @@
-package net.openalmc.mixin;
+package net.openalmc.mixin.slowerlog;
 
 import net.minecraft.client.sound.SoundSystem;
 import net.openalmc.OpenALMCMod;
@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Mixin(SoundSystem.class)
-public abstract class MixinSoundSystemSlowerLog {
+public abstract class MixinSoundSystem {
     private LocalDateTime lastLogged = LocalDateTime.now();
 
     @Redirect(

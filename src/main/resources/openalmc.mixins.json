@@ -5,14 +5,17 @@
   "mixins": [
   ],
   "client": [
-    "MixinAlCompatibility",
-    "MixinAlUtilInvoker",
-    "MixinSourceInvoker",
-    "MixinSourceBetterStreaming",
-    "MixinSourceCompatibility",
-    "MixinSoundEngineCompatibility",
-    "MixinSourceSetSlowerLog",
-    "MixinSoundSystemSlowerLog"
+    "singlepool.MixinSoundEngine",
+    "singlepool.MixinSourceSet",
+    "betterstreaming.MixinSource",
+    "compatibility.MixinAl",
+    "compatibility.MixinSoundEngine",
+    "compatibility.MixinSource",
+    "config.MixinSoundEngine",
+    "invokers.MixinAlUtilInvoker",
+    "invokers.MixinSourceInvoker",
+    "slowerlog.MixinSoundSystem",
+    "slowerlog.MixinSourceSet"
   ],
   "injectors": {
     "defaultRequire": 1

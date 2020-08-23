@@ -1,8 +1,9 @@
-package net.openalmc.mixin;
+package net.openalmc.mixin.betterstreaming;
 
 import com.google.common.collect.Sets;
 import net.minecraft.client.sound.AudioStream;
 import net.openalmc.OpenALMCMod;
+import net.openalmc.mixin.invokers.MixinAlUtilInvoker;
 import org.lwjgl.openal.AL10;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 @Mixin(Source.class)
-public abstract class MixinSourceBetterStreaming {
+public abstract class MixinSource {
     @Shadow
     @Final
     private int pointer;
@@ -58,7 +59,8 @@ public abstract class MixinSourceBetterStreaming {
 
     @Inject(
             method = "isStopped",
-            at = @At("RETURN")
+            at = @At("RETURN"),
+            cancellable = true
     )
     private void onIsStopped(CallbackInfoReturnable<Boolean> cir) {
         if (aborted && !cir.getReturnValue()) {

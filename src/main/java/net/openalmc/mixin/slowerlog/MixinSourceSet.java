@@ -1,4 +1,4 @@
-package net.openalmc.mixin;
+package net.openalmc.mixin.slowerlog;
 
 import net.openalmc.OpenALMCMod;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Mixin(SoundEngine.SourceSetImpl.class)
-public class MixinSourceSetSlowerLog {
+public class MixinSourceSet {
     private LocalDateTime lastLogged = LocalDateTime.now();
 
     @Redirect(

@@ -1,4 +1,4 @@
-package net.openalmc.mixin;
+package net.openalmc.mixin.invokers;
 
 import javax.sound.sampled.AudioFormat;
 

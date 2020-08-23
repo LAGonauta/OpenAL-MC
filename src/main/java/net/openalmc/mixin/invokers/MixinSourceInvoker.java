@@ -1,4 +1,4 @@
-package net.openalmc.mixin;
+package net.openalmc.mixin.invokers;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
