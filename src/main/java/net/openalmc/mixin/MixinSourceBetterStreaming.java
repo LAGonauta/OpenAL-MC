@@ -1,32 +1,76 @@
-package net.openalmc.implementation;
+package net.openalmc.mixin;
 
+import com.google.common.collect.Sets;
 import net.minecraft.client.sound.AudioStream;
-import net.minecraft.client.sound.Source;
 import net.openalmc.OpenALMCMod;
-import net.openalmc.mixin.MixinAlUtilInvoker;
+import org.lwjgl.openal.AL10;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
 
+import net.minecraft.client.sound.Source;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Set;
 
-import javax.sound.sampled.AudioFormat;
-
-import com.google.common.collect.Sets;
-
-import org.lwjgl.openal.AL10;
-
-public class StreamingSource extends Source {
+@Mixin(Source.class)
+public abstract class MixinSourceBetterStreaming {
+    @Shadow
+    @Final
     private int pointer;
-    private Set<Integer> buffered = Sets.newHashSet();
-    private boolean aborted = false;
 
-    public StreamingSource(int pointer) {
-        super(pointer);
-        this.pointer = pointer;
+    @Shadow
+    private AudioStream stream;
+
+    @Shadow
+    private int bufferSize = 16384;
+
+    @Shadow
+    private static int getBufferSize(AudioFormat format, int time) {
+        throw new AssertionError("Should not be called");
     }
 
-    @Override
+    private final Set<Integer> buffered = Sets.newHashSet();
+    private boolean aborted = false;
+
+    @Inject(method = "stop", at = @At("HEAD"))
+    private void stop(CallbackInfo ci) {
+        aborted = true;
+    }
+
+    @Inject(method = "close", at = @At("RETURN"))
+    private void onClose(CallbackInfo ci) {
+        for(int buffer : buffered) {
+            if (AL10.alIsBuffer(buffer)) {
+                AL10.alDeleteBuffers(buffer);
+            }
+            MixinAlUtilInvoker.invokeCheckErrors("Deleting stream buffer");
+        }
+    }
+
+    @Inject(
+            method = "isStopped",
+            at = @At("RETURN")
+    )
+    private void onIsStopped(CallbackInfoReturnable<Boolean> cir) {
+        if (aborted && !cir.getReturnValue()) {
+            cir.setReturnValue(aborted);
+        }
+    }
+
+    /**
+     * @author LAGonauta
+     * @reason Reuse buffers on streaming
+     */
+    @Overwrite
     public void setStream(AudioStream stream) {
         this.stream = stream;
         AudioFormat audioFormat = stream.getFormat();
@@ -35,7 +79,7 @@ public class StreamingSource extends Source {
         int numBuffers = 4;
         if (this.stream != null) {
             try {
-                ArrayList<Integer> buffers = new ArrayList<Integer>();
+                ArrayList<Integer> buffers = new ArrayList<>();
                 for (int index = 0; index < numBuffers; ++index) {
                     int bufferId = bufferData(0);
                     if (bufferId > 0) {
@@ -56,29 +100,11 @@ public class StreamingSource extends Source {
         }
     }
 
-    @Override
-    public void stop() {
-        super.stop();
-        aborted = true;
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        for(int buffer : buffered) {
-            if (AL10.alIsBuffer(buffer)) {
-                AL10.alDeleteBuffers(buffer);
-            }
-            MixinAlUtilInvoker.invokeCheckErrors("Deleting stream buffer");
-        }
-    }
-
-    @Override
-    public boolean isStopped() {
-        return super.isStopped() || aborted;
-    }
-
-    @Override
+    /**
+     * @author LAGonauta
+     * @reason Reuse buffer on streaming
+     */
+    @Overwrite
     public void tick() {
         if (this.stream != null) {
             int processedBuffers = AL10.alGetSourcei(this.pointer, AL10.AL_BUFFERS_PROCESSED);
@@ -88,9 +114,9 @@ public class StreamingSource extends Source {
                 MixinAlUtilInvoker.invokeCheckErrors("Unqueue buffers");
 
                 try {
-                    ArrayList<Integer> buffers = new ArrayList<Integer>();
-                    for (int i = 0; i < bufferIds.length; ++i) {
-                        int b = bufferData(bufferIds[i]);
+                    ArrayList<Integer> buffers = new ArrayList<>();
+                    for (int bufferId : bufferIds) {
+                        int b = bufferData(bufferId);
                         if (b > 0) {
                             buffers.add(b);
                         }

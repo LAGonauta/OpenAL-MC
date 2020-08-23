@@ -1,28 +1,30 @@
 package net.openalmc.mixin;
 
-import net.minecraft.client.sound.SoundSystem;
 import net.openalmc.OpenALMCMod;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.At;
+
+import net.minecraft.client.sound.SoundEngine;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-@Mixin(SoundSystem.class)
-public abstract class MixinSoundSystem {
+@Mixin(SoundEngine.SourceSetImpl.class)
+public class MixinSourceSetSlowerLog {
     private LocalDateTime lastLogged = LocalDateTime.now();
 
     @Redirect(
-            method = "play(Lnet/minecraft/client/sound/SoundInstance;)V",
-            at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;warn(Ljava/lang/String;)V", remap = false)
+            method = "createSource()Lnet/minecraft/client/sound/Source;",
+            at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;warn(Ljava/lang/String;Ljava/lang/Object;)V", remap = false)
     )
-    private void slowLogger(Logger logger, String message) {
+    private void slowLogger(Logger logger, String message, Object obj) {
         LocalDateTime now = LocalDateTime.now();
         if (Duration.between(lastLogged, now).compareTo(Duration.ofSeconds(1)) > 0) {
-            OpenALMCMod.LOGGER.warn(message);
+            OpenALMCMod.LOGGER.warn(message, obj);
             lastLogged = LocalDateTime.now();
         }
     }
+
 }

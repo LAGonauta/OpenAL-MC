@@ -11,14 +11,12 @@ import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.sound.SoundEngine;
-import net.minecraft.client.sound.SoundEngine.RunMode;
 import net.openalmc.OpenALMCMod;
-import net.openalmc.implementation.LocalSourceSet;
 
 import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
 
 @Mixin(SoundEngine.class)
-public abstract class MixinSoundEngine {
+public abstract class MixinSoundEngineCompatibility {
     @ModifyArg(
             method = "init",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(III)I", ordinal = 1),
@@ -28,25 +26,9 @@ public abstract class MixinSoundEngine {
         return 1024;
     }
 
-    @Redirect(
-            method = "init",
-            at = @At(value = "NEW", target = "Lnet/minecraft/client/sound/SoundEngine$SourceSetImpl;", ordinal = 0)
-    )
-    private SoundEngine.SourceSetImpl newStaticSourceSet(int maxSources) {
-        return new LocalSourceSet(maxSources, RunMode.STATIC);
-    }
-
-    @Redirect(
-            method = "init",
-            at = @At(value = "NEW", target = "Lnet/minecraft/client/sound/SoundEngine$SourceSetImpl;", ordinal = 1)
-    )
-    private SoundEngine.SourceSetImpl newStreamingSourceSet(int maxSources) {
-        return new LocalSourceSet(maxSources, RunMode.STREAMING);
-    }
-
     @Inject(
             method = "init",
-            at = @At(value = "INVOKE", shift = Shift.AFTER, target = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;")
+            at = @At(value = "INVOKE", shift = Shift.AFTER, target = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;", remap = false)
     )
     private void setLinearDistanceModel(CallbackInfo ci) {
         AL11.alDistanceModel(AL11.AL_LINEAR_DISTANCE);

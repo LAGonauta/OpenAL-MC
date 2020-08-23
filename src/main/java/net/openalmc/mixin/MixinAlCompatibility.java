@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = AL.class, remap = false)
-public abstract class MixinAl {
+public abstract class MixinAlCompatibility {
     @ModifyArg(
             at = @At(value = "INVOKE", target = "Lorg/lwjgl/system/APIUtil;apiParseVersion(Ljava/lang/String;)Lorg/lwjgl/system/APIUtil$APIVersion;", ordinal = 0, remap = false),
             method = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
