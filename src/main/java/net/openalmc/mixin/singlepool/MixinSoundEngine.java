@@ -31,7 +31,10 @@ public abstract class MixinSoundEngine {
      */
     @Overwrite
     public String getDebugString() {
-        return String.format("Sounds: %d/%d", this.streamingSources.getSourceCount() + this.staticSources.getSourceCount(), this.streamingSources.getMaxSourceCount());
+        return String.format("Sounds: %d/%d, %d streaming",
+                this.streamingSources.getSourceCount() + this.staticSources.getSourceCount(),
+                this.streamingSources.getMaxSourceCount(),
+                this.staticSources.getSourceCount());
     }
 
     /**
