@@ -5,8 +5,6 @@
   "mixins": [
   ],
   "client": [
-    "singlepool.MixinSoundEngine",
-    "singlepool.MixinSourceSet",
     "betterstreaming.MixinSource",
     "compatibility.MixinAl",
     "compatibility.MixinSoundEngine",
@@ -14,6 +12,8 @@
     "config.MixinSoundEngine",
     "invokers.MixinAlUtilInvoker",
     "invokers.MixinSourceInvoker",
+    "singlepool.MixinSoundEngine",
+    "singlepool.MixinSourceSetAccessor",
     "slowerlog.MixinSoundSystem",
     "slowerlog.MixinSourceSet"
   ],
