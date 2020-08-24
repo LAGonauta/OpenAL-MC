@@ -7,12 +7,8 @@ Mod to use most OpenAL drivers with MC
 - Allow LWJGL to work with OpenAL router
 - Add driver quirk to LWJGL for Creative's hardware OpenAL
 - Allow using all available sources for static sources, priorizing streaming sources
-
-# TODO
-- Allow selection of:
-  - Output device
-  - Output frequency
-  - Number of EFX auxiliary sends
+- Selection of device, frequency, and number of EFX auxiliary sends
 
 # Dependencies
 - GrossFabricHacks (to allow one to mixin into LWJGL)
+- ModMenu
