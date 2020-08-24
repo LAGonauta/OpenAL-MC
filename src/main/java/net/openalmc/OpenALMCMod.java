@@ -1,5 +1,6 @@
 package net.openalmc;
 
+import net.openalmc.config.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,5 +14,6 @@ public class OpenALMCMod implements ClientModInitializer {
 
 		LOGGER.info("Initializing OpenALMCMod");
 
+		Config.loadData();
 	}
 }
