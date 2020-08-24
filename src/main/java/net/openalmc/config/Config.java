@@ -15,7 +15,7 @@ public class Config {
     private static ConfigModel data = new ConfigModel();
 
     private static File getConfigFile() {
-        return new File("./config/openalmc/data.json");
+        return new File("./config/openalmc/data.obj");
     }
 
     public static ConfigModel getData() {
