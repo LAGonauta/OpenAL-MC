@@ -14,7 +14,7 @@
   },
 
   "license": "GPLv3",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/openalmc/icon.png",
 
   "environment": "client",
   "entrypoints": {

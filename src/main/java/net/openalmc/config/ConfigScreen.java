@@ -49,8 +49,7 @@ public class ConfigScreen implements ModMenuApi {
                     .requireRestart()
                     .setMin(8000)
                     .setMax(192000)
-                    .setSaveConsumer(newValue -> currentFrequency = newValue)
-                    .setTooltip(new TranslatableText("openalmc.config.frequency.tooltip")).build()
+                    .setSaveConsumer(newValue -> currentFrequency = newValue).build()
             );
 
             settings.addEntry(entryBuilder.startIntField(new TranslatableText("openalmc.config.maxsends"), currentMaxSends)
@@ -58,8 +57,7 @@ public class ConfigScreen implements ModMenuApi {
                     .requireRestart()
                     .setMin(2)
                     .setMax(16) // TODO: depends on implementation
-                    .setSaveConsumer(newValue -> currentMaxSends = newValue)
-                    .setTooltip(new TranslatableText("openalmc.config.maxsends.tooltip")).build()
+                    .setSaveConsumer(newValue -> currentMaxSends = newValue).build()
             );
 
             return builder.build();

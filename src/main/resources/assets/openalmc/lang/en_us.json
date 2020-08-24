@@ -1,0 +1,8 @@
+{
+  "openalmc.config.title": "OpenAL MC Config",
+
+  "openalmc.config.category": "All",
+  "openalmc.config.devices": "Devices",
+  "openalmc.config.frequency": "Frequency",
+  "openalmc.config.maxsends" : "Max Source Sends"
+}
