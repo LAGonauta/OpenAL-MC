@@ -4,7 +4,6 @@ import net.minecraft.client.sound.SoundEngine;
 import net.openalmc.config.Config;
 import net.openalmc.config.ConfigModel;
 import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.EXTEfx;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,9 +11,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-
-import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
 
 @Mixin(SoundEngine.class)
 public abstract class MixinSoundEngine {
@@ -39,7 +35,9 @@ public abstract class MixinSoundEngine {
     )
     private long setContextAttributes(long deviceId, IntBuffer attrList) {
 
-        int[] list = new int[]{ ALC10.ALC_FREQUENCY, 48000, EXTEfx.ALC_MAX_AUXILIARY_SENDS, 2, 0 }; // TODO custom from menu
+        ConfigModel data = Config.getData();
+
+        int[] list = new int[]{ ALC10.ALC_FREQUENCY, data.Frequency, EXTEfx.ALC_MAX_AUXILIARY_SENDS, data.MaxSends, 0 };
 
         return ALC10.alcCreateContext(deviceId, list);
     }
