@@ -23,6 +23,9 @@
     ],
     "gfh:prePreLaunch": [
       "net.openalmc.OpenALMCPrePreLaunch"
+    ],
+    "modmenu": [
+      "net.openalmc.config.ConfigScreen"
     ]
   },
   "mixins": [
