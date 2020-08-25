@@ -1,9 +1,6 @@
 package net.openalmc.mixin.compatibility;
 
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-
+import net.openalmc.compatibility.OpenALCaps;
 import org.lwjgl.openal.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
@@ -12,8 +9,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.client.sound.SoundEngine;
 import net.openalmc.OpenALMCMod;
-
-import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
 
 @Mixin(SoundEngine.class)
 public abstract class MixinSoundEngine {
@@ -43,5 +38,14 @@ public abstract class MixinSoundEngine {
     private void returnFromMethod(CallbackInfo ci) {
         OpenALMCMod.LOGGER.info("Removing extension check");
         ci.cancel();
+    }
+
+    @Inject(
+            method = "init",
+            at = @At("HEAD")
+    )
+    private void resetCapabilities(CallbackInfo ci) {
+        OpenALCaps.alcCaps = null;
+        OpenALCaps.alCaps = null;
     }
 }

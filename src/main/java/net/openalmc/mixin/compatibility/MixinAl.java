@@ -1,11 +1,13 @@
 package net.openalmc.mixin.compatibility;
 
 import net.openalmc.OpenALMCMod;
+import net.openalmc.compatibility.OpenALCaps;
 import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = AL.class, remap = false)
 public abstract class MixinAl {
@@ -28,13 +30,33 @@ public abstract class MixinAl {
         return versionString;
     }
 
-    @Redirect(
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/EXTThreadLocalContext;alcGetThreadContext()J", ordinal = 0, remap = false),
-            method = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
+    @Inject(
+            method = "createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
+            at = @At("HEAD"),
             remap = false
     )
-    private static long disableThreadContext() {
-        OpenALMCMod.LOGGER.info("Disabling ThreadContext");
-        return 0; // NULL
+    private static void setAlcCaps(ALCCapabilities alcCaps, CallbackInfoReturnable<ALCapabilities> ci) {
+        OpenALCaps.alcCaps = alcCaps;
+    }
+
+    @Inject(
+            method = "createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
+            at = @At("RETURN"),
+            remap = false
+    )
+    private static void setAlCaps(CallbackInfoReturnable<ALCapabilities> cir) {
+        OpenALCaps.alCaps = cir.getReturnValue();
+    }
+
+    @Inject(
+            method = "getICD",
+            at = @At("HEAD"),
+            cancellable = true,
+            remap = false
+    )
+    private static void onGetICD(CallbackInfoReturnable<ALCapabilities> cir) {
+        if (OpenALCaps.alCaps != null) {
+            cir.setReturnValue(OpenALCaps.alCaps);
+        }
     }
 }
