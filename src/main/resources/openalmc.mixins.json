@@ -5,6 +5,8 @@
   "mixins": [
   ],
   "client": [
+    "batchcontext.MixinContextAccessor",
+    "batchcontext.MixinSoundSystem",
     "betterstreaming.MixinSource",
     "compatibility.MixinAl",
     "compatibility.MixinAlc",
