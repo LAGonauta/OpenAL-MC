@@ -13,8 +13,6 @@
     "config.MixinSoundEngine",
     "invokers.MixinAlUtilInvoker",
     "invokers.MixinSourceInvoker",
-    "singlepool.MixinSoundEngine",
-    "singlepool.MixinSourceSetAccessor",
     "slowerlog.MixinSoundSystem",
     "slowerlog.MixinSourceSet"
   ],
