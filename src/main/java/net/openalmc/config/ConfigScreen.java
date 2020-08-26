@@ -52,6 +52,14 @@ public class ConfigScreen implements ModMenuApi {
                     .setSaveConsumer(newValue -> data.MaxSends = newValue).build()
             );
 
+            settings.addEntry(entryBuilder.startFloatField(new TranslatableText("openalmc.config.dopplerfactor"), data.DopplerFactor)
+                    .setDefaultValue(1.0f)
+                    .requireRestart()
+                    .setMin(0.1f)
+                    .setMax(10.0f)
+                    .setSaveConsumer(newValue -> data.DopplerFactor = newValue).build()
+            );
+
             return builder.build();
         };
     }
