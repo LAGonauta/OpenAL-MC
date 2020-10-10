@@ -19,6 +19,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
+
 	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
 
 	modApi "me.shedaniel.cloth:config-2:${project.cloth_version}"
@@ -30,6 +32,12 @@ dependencies {
 
 minecraft {
 	accessWidener "src/main/resources/openalmc.accesswidener"
+}
+
+repositories {
+	maven {
+		url = 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/'
+	}
 }
 
 processResources {

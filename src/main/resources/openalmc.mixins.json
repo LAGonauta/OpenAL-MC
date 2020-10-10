@@ -16,9 +16,7 @@
     "doppler.listener.MixinSoundSystem",
     "doppler.sources.MixinSoundSystem",
     "invokers.MixinAlUtilInvoker",
-    "invokers.MixinSourceInvoker",
-    "slowerlog.MixinSoundSystem",
-    "slowerlog.MixinSourceSet"
+    "invokers.MixinSourceInvoker"
   ],
   "injectors": {
     "defaultRequire": 1
