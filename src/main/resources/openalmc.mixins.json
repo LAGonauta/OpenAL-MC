@@ -6,8 +6,6 @@
   ],
   "client": [
     "betterstreaming.MixinSource",
-    "compatibility.MixinAl",
-    "compatibility.MixinAlc",
     "compatibility.MixinSoundEngine",
     "compatibility.MixinSource",
     "config.MixinSoundEngine",

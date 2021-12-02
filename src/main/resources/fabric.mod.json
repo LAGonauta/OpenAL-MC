@@ -21,9 +21,6 @@
     "client": [
       "net.openalmc.OpenALMCMod"
     ],
-    "gfh:prePreLaunch": [
-      "net.openalmc.OpenALMCPrePreLaunch"
-    ],
     "modmenu": [
       "net.openalmc.config.ConfigScreen"
     ]
