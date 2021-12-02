@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinAl {
     @ModifyArg(
             at = @At(value = "INVOKE", target = "Lorg/lwjgl/system/APIUtil;apiParseVersion(Ljava/lang/String;)Lorg/lwjgl/system/APIUtil$APIVersion;", ordinal = 0, remap = false),
-            method = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
+            method = "createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;",
             remap = false
     )
     private static String fixVersionString(String versionString) {
