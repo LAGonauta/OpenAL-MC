@@ -18,8 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Mixin(Source.class)
@@ -81,21 +81,14 @@ public abstract class MixinSource {
         int numBuffers = 4;
         if (this.stream != null) {
             try {
-                ArrayList<Integer> buffers = new ArrayList<>();
-                for (int index = 0; index < numBuffers; ++index) {
-                    int bufferId = bufferData(0);
+                List<Integer> buffers = new ArrayList<>(numBuffers);
+                for (var index = 0; index < numBuffers; ++index) {
+                    var bufferId = bufferData(0);
                     if (bufferId > 0) {
                         buffers.add(bufferId);
                     }
                 }
-                if (buffers.size() > 0) {
-                    int[] finalBuffers = new int[buffers.size()];
-                    for (int index = 0, end = buffers.size(); index < end; ++index) {
-                        finalBuffers[index] = buffers.get(index);
-                    }
-                    buffered.addAll(buffers);
-                    AL10.alSourceQueueBuffers(this.pointer, finalBuffers);
-                }
+                enqueueBuffers(buffers);
             } catch (IOException ex) {
                 OpenALMCMod.LOGGER.error("Failed to read from audio stream", ex);
             }
@@ -111,25 +104,19 @@ public abstract class MixinSource {
         if (this.stream != null) {
             int processedBuffers = AL10.alGetSourcei(this.pointer, AL10.AL_BUFFERS_PROCESSED);
             if (processedBuffers > 0) {
-                int[] bufferIds = new int[processedBuffers];
+                final var bufferIds = new int[processedBuffers];
                 AL10.alSourceUnqueueBuffers(this.pointer, bufferIds);
                 MixinAlUtilInvoker.invokeCheckErrors("Unqueue buffers");
 
                 try {
-                    ArrayList<Integer> buffers = new ArrayList<>();
-                    for (int bufferId : bufferIds) {
-                        int b = bufferData(bufferId);
-                        if (b > 0) {
-                            buffers.add(b);
+                    List<Integer> buffers = new ArrayList<>(processedBuffers);
+                    for (final var bufferId : bufferIds) {
+                        int buffer = bufferData(bufferId);
+                        if (buffer > 0) {
+                            buffers.add(buffer);
                         }
                     }
-                    if (buffers.size() > 0) {
-                        int[] finalBuffers = new int[buffers.size()];
-                        for (int index = 0, end = buffers.size(); index < end; ++index) {
-                            finalBuffers[index] = buffers.get(index);
-                        }
-                        AL10.alSourceQueueBuffers(this.pointer, finalBuffers);
-                    }
+                    enqueueBuffers(buffers);
 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -151,8 +138,20 @@ public abstract class MixinSource {
         }
     }
 
+    private void enqueueBuffers(final List<Integer> buffers) {
+        if (buffers.size() > 0) {
+            var finalBuffers = new int[buffers.size()];
+            for (int index = 0, end = buffers.size(); index < end; ++index) {
+                finalBuffers[index] = buffers.get(index);
+            }
+            buffered.addAll(buffers);
+            AL10.alSourceQueueBuffers(this.pointer, finalBuffers);
+            MixinAlUtilInvoker.invokeCheckErrors("Enqueuing buffers");
+        }
+    }
+
     private int bufferData(int bufferId) throws IOException {
-        ByteBuffer byteBuffer = this.stream.getBuffer(this.bufferSize);
+        final var byteBuffer = this.stream.getBuffer(this.bufferSize);
         if (byteBuffer != null && byteBuffer.remaining() > 0) {
             //OpenALMCMod.LOGGER.info("Buffering for " + pointer + " : " + bufferId + ".");
             if (bufferId == 0) {
@@ -163,8 +162,8 @@ public abstract class MixinSource {
                 return 0;
             }
 
-            AudioFormat format = this.stream.getFormat();
-            int formatId = MixinAlUtilInvoker.invokeGetFormatId(format);
+            final var format = this.stream.getFormat();
+            final var formatId = MixinAlUtilInvoker.invokeGetFormatId(format);
             AL10.alBufferData(bufferId, formatId, byteBuffer, (int) format.getSampleRate());
             MixinAlUtilInvoker.invokeCheckErrors("Assigning buffer data");
 
