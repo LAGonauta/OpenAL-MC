@@ -19,17 +19,17 @@ import java.nio.IntBuffer;
 public abstract class MixinSoundEngine {
     @Redirect(
             method = "openDevice",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcOpenDevice(Ljava/nio/ByteBuffer;)J", remap = false)
+            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcOpenDevice(Ljava/lang/CharSequence;)J", remap = false)
     )
-    private static long openNamedDevice(ByteBuffer buffer) {
-        if (buffer == null) {
+    private static long openNamedDevice(CharSequence deviceName) {
+        if (deviceName == null) {
             ConfigModel data = Config.getData();
             if (!data.DeviceName.equals("")) {
                 return ALC10.alcOpenDevice(data.DeviceName);
             }
         }
 
-        return ALC10.alcOpenDevice(buffer);
+        return ALC10.alcOpenDevice(deviceName);
     }
 
     @Redirect(
