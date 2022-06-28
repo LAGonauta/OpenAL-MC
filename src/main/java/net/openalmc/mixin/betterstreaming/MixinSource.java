@@ -2,14 +2,12 @@ package net.openalmc.mixin.betterstreaming;
 
 import com.google.common.collect.Sets;
 import net.minecraft.client.sound.AudioStream;
+import net.minecraft.client.sound.Source;
 import net.openalmc.OpenALMCMod;
 import net.openalmc.mixin.invokers.MixinAlUtilInvoker;
 import org.lwjgl.openal.AL10;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.client.sound.Source;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -72,8 +70,12 @@ public abstract class MixinSource {
      * @author LAGonauta
      * @reason Reuse buffers on streaming
      */
-    @Overwrite
-    public void setStream(AudioStream stream) {
+    @Inject(
+            method = "setStream",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sound/Source;read(I)V"),
+            cancellable = true
+    )
+    public void setStream(AudioStream stream, CallbackInfo ci) {
         this.stream = stream;
         AudioFormat audioFormat = stream.getFormat();
         this.bufferSize = getBufferSize(audioFormat, 1);
@@ -93,14 +95,15 @@ public abstract class MixinSource {
                 OpenALMCMod.LOGGER.error("Failed to read from audio stream", ex);
             }
         }
+        ci.cancel();
     }
 
     /**
      * @author LAGonauta
      * @reason Reuse buffer on streaming
      */
-    @Overwrite
-    public void tick() {
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    public void tick(CallbackInfo ci) {
         if (this.stream != null) {
             int processedBuffers = AL10.alGetSourcei(this.pointer, AL10.AL_BUFFERS_PROCESSED);
             if (processedBuffers > 0) {
@@ -136,6 +139,7 @@ public abstract class MixinSource {
                 }
             }
         }
+        ci.cancel();
     }
 
     private void enqueueBuffers(final List<Integer> buffers) {

@@ -24,7 +24,7 @@ public abstract class MixinSoundEngine {
     private static long openNamedDevice(CharSequence deviceName) {
         if (deviceName == null) {
             ConfigModel data = Config.getData();
-            if (!data.DeviceName.equals("")) {
+            if (!"".equals(data.DeviceName)) {
                 return ALC10.alcOpenDevice(data.DeviceName);
             }
         }
