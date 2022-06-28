@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -9,6 +9,21 @@ targetCompatibility = JavaVersion.VERSION_17
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+repositories {
+	//maven {
+	//	name = 'GrossFabricHacks'
+	//	url = 'https://maven.concern.i.ng/'
+	//}
+	maven {
+		name = 'Cloth Config Maven'
+		url = 'https://maven.shedaniel.me/'
+	}
+	maven {
+		name = 'TerraformersMC Maven'
+		url = 'https://maven.terraformersmc.com/releases/'
+	}
+}
 
 dependencies {
 	//to change the versions see the gradle.properties file
@@ -25,31 +40,16 @@ dependencies {
 	//modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: "${project.grossfabrichacks_version}"
 }
 
-loom {
-	accessWidenerPath = file("src/main/resources/openalmc.accesswidener")
-}
-
-repositories {
-	maven {
-		name = 'GrossFabricHacks'
-		url = 'https://maven.concern.i.ng/'
-	}
-	maven {
-		name = 'Cloth Config Maven'
-		url = 'https://maven.shedaniel.me/'
-	}
-	maven {
-		name = 'TerraformersMC Maven'
-		url = 'https://maven.terraformersmc.com/releases/'
-	}
-}
-
 processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
 		expand "version": project.version
 	}
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/openalmc.accesswidener")
 }
 
 tasks.withType(JavaCompile).configureEach {

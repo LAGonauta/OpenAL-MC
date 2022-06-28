@@ -4,7 +4,9 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
+
+import java.util.function.Function;
 
 public class ConfigScreen implements ModMenuApi {
     @Override
@@ -12,18 +14,18 @@ public class ConfigScreen implements ModMenuApi {
         return parent -> {
             final var builder = ConfigBuilder.create()
                     .setParentScreen(parent)
-                    .setTitle(new TranslatableText("openalmc.config.title"));
+                    .setTitle(Text.translatable("openalmc.config.title"));
             final var entryBuilder = builder.entryBuilder();
 
             builder.setSavingRunnable(Config::saveData);
 
             final var data = Config.getData();
 
-            final var settings = builder.getOrCreateCategory(new TranslatableText("openalmc.config.category"));
+            final var settings = builder.getOrCreateCategory(Text.translatable("openalmc.config.category"));
             {
                 final var deviceDropdownMenu = entryBuilder.startDropdownMenu(
-                        new TranslatableText("openalmc.config.devices"),
-                        DropdownMenuBuilder.TopCellElementBuilder.of(data.DeviceName.equals("") ? Config.Devices.get(0) : data.DeviceName, (val) -> val),
+                        Text.translatable("openalmc.config.devices"),
+                        DropdownMenuBuilder.TopCellElementBuilder.of("".equals(data.DeviceName) ? Config.Devices.get(0) : data.DeviceName, Function.identity()),
                         DropdownMenuBuilder.CellCreatorBuilder.of()
                 )
                         .requireRestart()
@@ -34,7 +36,7 @@ public class ConfigScreen implements ModMenuApi {
                 settings.addEntry(deviceDropdownMenu.build());
             }
 
-            settings.addEntry(entryBuilder.startIntField(new TranslatableText("openalmc.config.frequency"), data.Frequency)
+            settings.addEntry(entryBuilder.startIntField(Text.translatable("openalmc.config.frequency"), data.Frequency)
                     .setDefaultValue(48000)
                     .requireRestart()
                     .setMin(8000)
@@ -42,7 +44,7 @@ public class ConfigScreen implements ModMenuApi {
                     .setSaveConsumer(newValue -> data.Frequency = newValue).build()
             );
 
-            settings.addEntry(entryBuilder.startIntField(new TranslatableText("openalmc.config.maxsends"), data.MaxSends)
+            settings.addEntry(entryBuilder.startIntField(Text.translatable("openalmc.config.maxsends"), data.MaxSends)
                     .setDefaultValue(2)
                     .requireRestart()
                     .setMin(2)
@@ -50,7 +52,7 @@ public class ConfigScreen implements ModMenuApi {
                     .setSaveConsumer(newValue -> data.MaxSends = newValue).build()
             );
 
-            settings.addEntry(entryBuilder.startFloatField(new TranslatableText("openalmc.config.dopplerfactor"), data.DopplerFactor)
+            settings.addEntry(entryBuilder.startFloatField(Text.translatable("openalmc.config.dopplerfactor"), data.DopplerFactor)
                     .setDefaultValue(1.0f)
                     .requireRestart()
                     .setMin(0.1f)
