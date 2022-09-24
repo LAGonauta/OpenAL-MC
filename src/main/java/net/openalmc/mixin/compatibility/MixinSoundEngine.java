@@ -1,6 +1,5 @@
 package net.openalmc.mixin.compatibility;
 
-import net.openalmc.compatibility.OpenALCaps;
 import org.lwjgl.openal.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
@@ -42,14 +41,5 @@ public abstract class MixinSoundEngine {
                 ((SoundEngine)(Object)this).getCurrentDeviceName()
         );
         ci.cancel();
-    }
-
-    @Inject(
-            method = "init",
-            at = @At("HEAD")
-    )
-    private void resetCapabilities(CallbackInfo ci) {
-        OpenALCaps.alcCaps = null;
-        OpenALCaps.alCaps = null;
     }
 }
