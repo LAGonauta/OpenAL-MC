@@ -24,7 +24,7 @@ public class Config {
 
     public static void loadData() {
         try {
-            File file = getConfigFile();
+            final var file = getConfigFile();
             if (file.exists()) {
                 FileInputStream fileInputStream
                         = new FileInputStream(file);
@@ -43,7 +43,7 @@ public class Config {
     }
 
     public static void saveData() {
-        File file = getConfigFile();
+        final var file = getConfigFile();
         if (!file.exists()) {
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
@@ -56,9 +56,9 @@ public class Config {
         }
 
         try {
-            FileOutputStream fileOutputStream
+            final var fileOutputStream
                     = new FileOutputStream(file, false);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            final var objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(data);
             objectOutputStream.flush();
             objectOutputStream.close();
@@ -68,7 +68,7 @@ public class Config {
     }
 
     private static List<String> getDevices() {
-        ArrayList<String> devices = new ArrayList<>();
+        final var devices = new ArrayList<String>();
         long deviceNamesPointer = 0;
         if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATION_EXT")) {
             if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
@@ -79,7 +79,7 @@ public class Config {
         }
 
         if (deviceNamesPointer > 0) {
-            String deviceName = "";
+            var deviceName = "";
             do {
                 deviceName = memUTF8Safe(deviceNamesPointer);
                 if (deviceName != null && !deviceName.equals("")) {

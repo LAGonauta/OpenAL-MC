@@ -21,9 +21,6 @@
     "client": [
       "net.openalmc.OpenALMCMod"
     ],
-    "gfh:prePreLaunch": [
-      "net.openalmc.OpenALMCPrePreLaunch"
-    ],
     "modmenu": [
       "net.openalmc.config.ConfigScreen"
     ]
@@ -35,10 +32,10 @@
   "accessWidener" : "openalmc.accesswidener",
 
   "depends": {
-    "fabricloader": ">=0.11.6",
-    "minecraft": "1.17.x"
+    "fabricloader": ">=0.12.8",
+    "minecraft": ">=1.19"
   },
   "suggests": {
-    "modmenu": "2.x"
+    "modmenu": "3.x"
   }
 }

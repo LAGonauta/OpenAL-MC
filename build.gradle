@@ -1,14 +1,29 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+repositories {
+	//maven {
+	//	name = 'GrossFabricHacks'
+	//	url = 'https://maven.concern.i.ng/'
+	//}
+	maven {
+		name = 'Cloth Config Maven'
+		url = 'https://maven.shedaniel.me/'
+	}
+	maven {
+		name = 'TerraformersMC Maven'
+		url = 'https://maven.terraformersmc.com/releases/'
+	}
+}
 
 dependencies {
 	//to change the versions see the gradle.properties file
@@ -16,39 +31,13 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: '6.1'
-
-	modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
+	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
 	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
-}
-
-minecraft {
-	accessWidener "src/main/resources/openalmc.accesswidener"
-}
-
-repositories {
-	maven {
-		name = 'GrossFabricHacks'
-		url = 'https://raw.githubusercontent.com/Devan-Kerman/Devan-Repo/master/'
-	}
-	maven {
-		name = 'Cloth Config Maven'
-		url = 'https://maven.shedaniel.me/'
-	}
-/*	maven {
-		name = 'TerraformersMC Maven'
-		url = 'https://maven.terraformersmc.com/releases/com/terraformersmc/modmenu/'
-	}*/
-	maven {
-		name = 'TerraformersMC Archive'
-		url = 'https://raw.githubusercontent.com/TerraformersMC/Archive/main/releases/'
-	}
+	//modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: "${project.grossfabrichacks_version}"
 }
 
 processResources {
@@ -59,15 +48,13 @@ processResources {
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	// ensure that the encoding is set to UTF-8, no matter what the system default is
-	// this fixes some edge cases with special characters not displaying correctly
-	// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-	// If Javadoc is generated, this must be specified in that task too.
-	it.options.encoding = "UTF-8"
+loom {
+	accessWidenerPath = file("src/main/resources/openalmc.accesswidener")
+}
 
-	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+tasks.withType(JavaCompile).configureEach {
+	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+	it.options.release = 17
 }
 
 java {
@@ -87,13 +74,7 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+			from components.java
 		}
 	}
 

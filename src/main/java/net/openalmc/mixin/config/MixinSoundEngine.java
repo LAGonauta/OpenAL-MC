@@ -1,48 +1,70 @@
 package net.openalmc.mixin.config;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.sound.SoundEngine;
+import net.openalmc.OpenALMCMod;
 import net.openalmc.config.Config;
 import net.openalmc.config.ConfigModel;
+import net.openalmc.mixin.invokers.MixinAlUtilInvoker;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.EXTEfx;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(SoundEngine.class)
 public abstract class MixinSoundEngine {
+    @Shadow private long contextPointer;
+
+    @Shadow private long devicePointer;
+
     @Redirect(
             method = "openDevice",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcOpenDevice(Ljava/nio/ByteBuffer;)J", remap = false)
+            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcOpenDevice(Ljava/lang/CharSequence;)J", remap = false)
     )
-    private static long openNamedDevice(ByteBuffer buffer) {
-        if (buffer == null) {
-            ConfigModel data = Config.getData();
-            if (!data.DeviceName.equals("")) {
+    private static long openNamedDevice(CharSequence deviceName) {
+        if (deviceName == null) {
+            var data = Config.getData();
+            if (!"".equals(data.DeviceName)) {
                 return ALC10.alcOpenDevice(data.DeviceName);
             }
         }
 
-        return ALC10.alcOpenDevice(buffer);
+        return ALC10.alcOpenDevice(deviceName);
     }
 
-    @Redirect(
+    @Inject(
             method = "init",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false)
+            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcMakeContextCurrent(J)Z", shift = At.Shift.BEFORE),
+            locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private long setContextAttributes(long deviceId, IntBuffer attrList) {
+    private void setAttr(String deviceSpecifier, boolean directionalAudio, CallbackInfo ci, ALCCapabilities aLCCapabilities) {
+        if (this.contextPointer != 0) {
+            ALC10.alcDestroyContext(this.contextPointer);
+            this.contextPointer = 0;
+        }
 
-        ConfigModel data = Config.getData();
+        var data = Config.getData();
 
-        int[] list = new int[]{ ALC10.ALC_FREQUENCY, data.Frequency, EXTEfx.ALC_MAX_AUXILIARY_SENDS, data.MaxSends, 0 };
+        var maxSends = data.MaxSends;
+        if (FabricLoader.getInstance().isModLoaded("sound_physics_remastered")) {
+            OpenALMCMod.LOGGER.info("Sound Physics Remastered is loaded. Setting Max Sends to 4");
+            maxSends = 4;
+        }
 
-        return ALC10.alcCreateContext(deviceId, list);
+        var list = new int[]{ ALC10.ALC_FREQUENCY, data.Frequency, EXTEfx.ALC_MAX_AUXILIARY_SENDS, maxSends, 0, 0 };
+
+        this.contextPointer = ALC10.alcCreateContext(this.devicePointer, list);
+
+        if (MixinAlUtilInvoker.invokeCheckAlcErrors(this.devicePointer, "creating context on device ")) {
+            OpenALMCMod.LOGGER.error("Some error creating context, continuing anyway. Context handle: {}", this.contextPointer);
+        }
     }
 
     @Inject(

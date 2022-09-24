@@ -37,6 +37,10 @@ public abstract class MixinSoundEngine {
     )
     private void returnFromMethod(CallbackInfo ci) {
         OpenALMCMod.LOGGER.info("Removing extension check");
+        OpenALMCMod.LOGGER.info(
+                "OpenAL initialized on device {}",
+                ((SoundEngine)(Object)this).getCurrentDeviceName()
+        );
         ci.cancel();
     }
 
