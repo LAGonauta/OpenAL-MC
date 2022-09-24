@@ -8,5 +8,9 @@ Mod to use most OpenAL drivers with MC
 - Add driver quirk to LWJGL for Creative's hardware OpenAL
 - Selection of device, frequency, and number of EFX auxiliary sends
 
+# Using
+- Install as a Fabric mod as usual
+- Add `-Dorg.lwjgl.openal.libname="C:/Windows/System32/OpenAL32.dll"` (or equivalent) as Java argument
+
 # Dependencies
 - ModMenu
