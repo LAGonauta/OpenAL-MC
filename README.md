@@ -7,6 +7,7 @@ Mod to use most OpenAL drivers with MC
 - Allow LWJGL to work with OpenAL router
 - Add driver quirk to LWJGL for Creative's hardware OpenAL
 - Selection of device, frequency, and number of EFX auxiliary sends
+- Doppler effect
 
 # Using
 - Install as a Fabric mod as usual
