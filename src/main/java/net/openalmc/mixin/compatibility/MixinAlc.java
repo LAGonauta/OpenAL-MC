@@ -4,6 +4,8 @@ import net.openalmc.OpenALMCMod;
 import net.openalmc.compatibility.OpenALCaps;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Set;
+
+import static org.lwjgl.system.JNI.invokePPZ;
 
 @Mixin(value = ALC.class, remap = false)
 public abstract class MixinAlc {
@@ -28,8 +32,11 @@ public abstract class MixinAlc {
     )
     private static Set<String> onExt(final Set<String> extensions) {
         if (extensions != null) {
-            OpenALMCMod.LOGGER.info("Guessing driver has EFX support");
-            extensions.add("ALC_EXT_EFX");
+            var list = new String[] {"ALC_ENUMERATE_ALL_EXT", "ALC_ENUMERATION_EXT", "ALC_EXT_CAPTURE", "ALC_EXT_EFX"};
+            for (var item : list) {
+                OpenALMCMod.LOGGER.info("Assuming driver has {} support", item);
+                extensions.add(item);
+            }
         }
         return extensions;
     }
