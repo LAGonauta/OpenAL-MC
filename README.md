@@ -9,5 +9,4 @@ Mod to use most OpenAL drivers with MC
 - Selection of device, frequency, and number of EFX auxiliary sends
 
 # Dependencies
-- GrossFabricHacks (to allow one to mixin into LWJGL)
 - ModMenu
