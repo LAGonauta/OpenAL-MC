@@ -1,11 +1,12 @@
 package net.openalmc.mixin.config;
 
+import net.minecraft.client.sound.AlUtil;
 import net.minecraft.client.sound.SoundEngine;
+import net.openalmc.OpenALMCMod;
 import net.openalmc.config.Config;
 import net.openalmc.config.ConfigModel;
-import org.lwjgl.openal.AL10;
-import org.lwjgl.openal.ALC10;
-import org.lwjgl.openal.EXTEfx;
+import net.openalmc.mixin.invokers.MixinAlUtilInvoker;
+import org.lwjgl.openal.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -42,7 +43,13 @@ public abstract class MixinSoundEngine {
 
         int[] list = new int[]{ ALC10.ALC_FREQUENCY, data.Frequency, EXTEfx.ALC_MAX_AUXILIARY_SENDS, data.MaxSends, 0 };
 
-        return ALC10.alcCreateContext(deviceId, list);
+        var context = ALC10.alcCreateContext(deviceId, list);
+
+        if (MixinAlUtilInvoker.invokeCheckAlcErrors(deviceId, "creating context on device ")) {
+            OpenALMCMod.LOGGER.error("Some error creating context, continuing anyway. Context handle: {}", context);
+        }
+
+        return context;
     }
 
     @Inject(
