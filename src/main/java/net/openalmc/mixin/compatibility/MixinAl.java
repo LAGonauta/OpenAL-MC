@@ -9,31 +9,29 @@ import org.lwjgl.system.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Set;
 import java.util.function.IntFunction;
 
-@Mixin(value = AL.class, remap = false)
+import static org.lwjgl.system.APIUtil.apiFilterExtensions;
+
+@Mixin(value = ALCapabilities.class, remap = false)
 public abstract class MixinAl {
     @Inject(
-            method = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;Ljava/util/function/IntFunction;)Lorg/lwjgl/openal/ALCapabilities;",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/system/APIUtil;apiFilterExtensions(Ljava/util/Set;Lorg/lwjgl/system/Configuration;)V"),
-            remap = false,
-            locals = LocalCapture.CAPTURE_FAILHARD
+            method = "<init>",
+            at = @At(value = "INVOKE", remap = false, target = "Ljava/util/function/IntFunction;apply(I)Ljava/lang/Object;"),
+            remap = false
     )
-    private static void onAlExt(ALCCapabilities alcCaps, IntFunction<PointerBuffer> bufferFactory, CallbackInfoReturnable<ALCapabilities> cir,
-                              long alGetProcAddress, FunctionProvider functionProvider, long GetString, long GetError,
-                              long IsExtensionPresent, String versionString, APIUtil.APIVersion apiVersion, int majorVersion,
-                              int minorVersion, int AL_VERSIONS[][], Set<String> supportedExtensions, String extensionsString) {
+    private void onAlExt(FunctionProvider provider, Set<String> supportedExtensions, IntFunction<PointerBuffer> bufferFactory, CallbackInfo ci) {
         if (supportedExtensions != null) {
             var list = new String[] {
                     "OpenAL_SOFT_bformat_ex",
                     "AL_EXT_ALAW",
                     "AL_EXT_BFORMAT",
                     "AL_EXT_DOUBLE",
-                    "ALC_EXT_EFX",
                     "AL_EXT_EXPONENT_DISTANCE",
                     "AL_EXT_FLOAT32",
                     "AL_EXT_IMA4",
@@ -65,16 +63,20 @@ public abstract class MixinAl {
                     "AL_SOFT_source_resampler",
                     "AL_SOFT_source_spatialize"
             };
+            var IsExtensionPresent = provider.getFunctionAddress("alIsExtensionPresent");
             for (var item : list) {
-                try (var stack = MemoryStack.stackPush()) {
-                    var result = JNI.invokePZ(MemoryUtil.memAddress(stack.ASCII(item, true)), IsExtensionPresent);
-                    OpenALMCMod.LOGGER.debug("Context support for {}: {}", item, result);
-                    if (result) {
-                        supportedExtensions.add(item);
+                if (!supportedExtensions.contains(item)) {
+                    try (var stack = MemoryStack.stackPush()) {
+                        var result = JNI.invokePZ(MemoryUtil.memAddress(stack.ASCII(item, true)), IsExtensionPresent);
+                        OpenALMCMod.LOGGER.debug("Context support for {}: {}", item, result);
+                        if (result) {
+                            supportedExtensions.add(item);
+                        }
                     }
                 }
-                supportedExtensions.add(item);
             }
+
+            APIUtil.apiFilterExtensions(supportedExtensions, Configuration.OPENAL_EXTENSION_FILTER);
         }
     }
 }

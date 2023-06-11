@@ -4,31 +4,24 @@ import net.openalmc.OpenALMCMod;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.system.FunctionProviderLocal;
-import org.lwjgl.system.JNI;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.system.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Set;
 import java.util.function.IntFunction;
 
-@Mixin(value = ALC.class, remap = false)
+@Mixin(value = ALCCapabilities.class, remap = false)
 public abstract class MixinAlc {
     @Inject(
-            method = "createCapabilities(JLjava/util/function/IntFunction;)Lorg/lwjgl/openal/ALCCapabilities;",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/system/APIUtil;apiFilterExtensions(Ljava/util/Set;Lorg/lwjgl/system/Configuration;)V"),
-            remap = false,
-            locals = LocalCapture.CAPTURE_FAILHARD
+            method = "<init>",
+            at = @At(value= "INVOKE", remap = false, target = "Ljava/util/function/IntFunction;apply(I)Ljava/lang/Object;"),
+            remap = false
     )
-    private static void onAlcExt(long device, IntFunction<PointerBuffer> bufferFactory, CallbackInfoReturnable<ALCCapabilities> cir,
-                              FunctionProviderLocal functionProvider, long GetIntegerv, long GetString, long IsExtensionPresent,
-                              int majorVersion, int minorVersion, int ALC_VERSIONS[][], Set<String> supportedExtensions) {
-
+    private void onAlcExt(FunctionProviderLocal provider, long device, Set<String> supportedExtensions,
+                                 IntFunction<PointerBuffer> bufferFactory, CallbackInfo ci) {
         if (supportedExtensions != null) {
             var list = new String[] {
                     "ALC_ENUMERATE_ALL_EXT",
@@ -46,16 +39,20 @@ public abstract class MixinAlc {
                     "ALC_SOFT_output_limiter",
                     "ALC_SOFT_pause_device"
             };
+            var IsExtensionPresent = provider.getFunctionAddress("alcIsExtensionPresent");
             for (var item : list) {
-                try (var stack = MemoryStack.stackPush()) {
-                    var result = JNI.invokePPZ(device, MemoryUtil.memAddress(stack.ASCII(item, true)), IsExtensionPresent);
-                    OpenALMCMod.LOGGER.debug("Device {} support for {}: {}", device, item, result);
-                    if (result) {
-                        supportedExtensions.add(item);
+                if (!supportedExtensions.contains(item)) {
+                    try (var stack = MemoryStack.stackPush()) {
+                        var result = JNI.invokePPZ(device, MemoryUtil.memAddress(stack.ASCII(item, true)), IsExtensionPresent);
+                        OpenALMCMod.LOGGER.info("Device {} support for {}: {}", device, item, result);
+                        if (result) {
+                            supportedExtensions.add(item);
+                        }
                     }
                 }
-                supportedExtensions.add(item);
             }
+
+            APIUtil.apiFilterExtensions(supportedExtensions, Configuration.OPENAL_EXTENSION_FILTER);
         }
     }
 }
