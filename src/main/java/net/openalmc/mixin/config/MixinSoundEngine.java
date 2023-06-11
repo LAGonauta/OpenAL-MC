@@ -41,7 +41,7 @@ public abstract class MixinSoundEngine {
 
     @Inject(
             method = "init",
-            at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/ALC10;alcMakeContextCurrent(J)Z", shift = At.Shift.BEFORE),
+            at = @At(value = "INVOKE", remap = false, target = "Lorg/lwjgl/openal/ALC10;alcMakeContextCurrent(J)Z", shift = At.Shift.BEFORE),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void setAttr(String deviceSpecifier, boolean directionalAudio, CallbackInfo ci, ALCCapabilities aLCCapabilities) {

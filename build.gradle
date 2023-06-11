@@ -11,10 +11,6 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	//maven {
-	//	name = 'GrossFabricHacks'
-	//	url = 'https://maven.concern.i.ng/'
-	//}
 	maven {
 		name = 'Cloth Config Maven'
 		url = 'https://maven.shedaniel.me/'

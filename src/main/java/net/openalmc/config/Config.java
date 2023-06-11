@@ -10,7 +10,7 @@ import java.util.List;
 import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
 
 public class Config {
-    public static List<String> Devices = getDevices();
+    private static List<String> devices;
 
     private static ConfigModel data = new ConfigModel();
 
@@ -37,7 +37,7 @@ public class Config {
             e.printStackTrace();
         }
 
-        if (!Devices.contains(data.DeviceName)) {
+        if (!getDevices().contains(data.DeviceName)) {
             data.DeviceName = "";
         }
     }
@@ -67,26 +67,28 @@ public class Config {
         }
     }
 
-    private static List<String> getDevices() {
-        final var devices = new ArrayList<String>();
-        long deviceNamesPointer = 0;
-        if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATION_EXT")) {
-            if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
-                deviceNamesPointer = ALC10.nalcGetString(0, ALC11.ALC_ALL_DEVICES_SPECIFIER);
-            } else {
-                deviceNamesPointer = ALC10.nalcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
-            }
-        }
-
-        if (deviceNamesPointer > 0) {
-            var deviceName = "";
-            do {
-                deviceName = memUTF8Safe(deviceNamesPointer);
-                if (deviceName != null && !deviceName.equals("")) {
-                    devices.add(deviceName);
-                    deviceNamesPointer += deviceName.length() + 1;
+    public synchronized static List<String> getDevices() {
+        if (devices == null) {
+            devices = new ArrayList<String>();
+            long deviceNamesPointer = 0;
+            if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATION_EXT")) {
+                if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
+                    deviceNamesPointer = ALC10.nalcGetString(0, ALC11.ALC_ALL_DEVICES_SPECIFIER);
+                } else {
+                    deviceNamesPointer = ALC10.nalcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
                 }
-            } while (deviceName != null && !deviceName.equals(""));
+            }
+
+            if (deviceNamesPointer > 0) {
+                var deviceName = "";
+                do {
+                    deviceName = memUTF8Safe(deviceNamesPointer);
+                    if (deviceName != null && !deviceName.equals("")) {
+                        devices.add(deviceName);
+                        deviceNamesPointer += deviceName.length() + 1;
+                    }
+                } while (deviceName != null && !deviceName.equals(""));
+            }
         }
 
         return devices;
