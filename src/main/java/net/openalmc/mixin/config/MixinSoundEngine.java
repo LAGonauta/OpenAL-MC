@@ -71,7 +71,7 @@ public abstract class MixinSoundEngine {
             method = "init",
             at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lorg/lwjgl/openal/AL;createCapabilities(Lorg/lwjgl/openal/ALCCapabilities;)Lorg/lwjgl/openal/ALCapabilities;", remap = false)
     )
-    private void setLinearDistanceModel(CallbackInfo ci) {
+    private void setDopplerFactor(CallbackInfo ci) {
         ConfigModel data = Config.getData();
 
         AL10.alDopplerFactor(data.DopplerFactor);
