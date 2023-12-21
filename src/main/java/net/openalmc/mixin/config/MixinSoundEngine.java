@@ -41,10 +41,14 @@ public abstract class MixinSoundEngine {
 
     @Inject(
             method = "init",
-            at = @At(value = "INVOKE", remap = false, target = "Lorg/lwjgl/openal/ALC10;alcMakeContextCurrent(J)Z", shift = At.Shift.BEFORE),
+            at = @At(value = "INVOKE", remap = false, target = "Lorg/lwjgl/openal/ALC10;alcCreateContext(JLjava/nio/IntBuffer;)J", shift = At.Shift.AFTER),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void setAttr(String deviceSpecifier, boolean directionalAudio, CallbackInfo ci, ALCCapabilities aLCCapabilities) {
+        if (MixinAlUtilInvoker.invokeCheckAlcErrors(this.devicePointer, "creating context on device ")) {
+            OpenALMCMod.LOGGER.error("Some error checking initial context, continuing anyway. Context handle: {}", this.contextPointer);
+        }
+
         if (this.contextPointer != 0) {
             ALC10.alcDestroyContext(this.contextPointer);
             this.contextPointer = 0;
