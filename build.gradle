@@ -22,15 +22,6 @@ repositories {
 }
 
 loom {
-	splitEnvironmentSourceSets()
-	accessWidenerPath = file("src/main/resources/openalmc.accesswidener")
-
-	mods {
-		"openalmc" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
 }
 
 dependencies {
