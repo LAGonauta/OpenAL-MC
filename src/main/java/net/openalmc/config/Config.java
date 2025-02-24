@@ -36,10 +36,6 @@ public class Config {
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
-
-        if (!getDevices().contains(data.DeviceName)) {
-            data.DeviceName = "";
-        }
     }
 
     public static void saveData() {
@@ -65,32 +61,5 @@ public class Config {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public synchronized static List<String> getDevices() {
-        if (devices == null) {
-            devices = new ArrayList<String>();
-            long deviceNamesPointer = 0;
-            if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATION_EXT")) {
-                if (ALC10.alcIsExtensionPresent(0, "ALC_ENUMERATE_ALL_EXT")) {
-                    deviceNamesPointer = ALC10.nalcGetString(0, ALC11.ALC_ALL_DEVICES_SPECIFIER);
-                } else {
-                    deviceNamesPointer = ALC10.nalcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
-                }
-            }
-
-            if (deviceNamesPointer > 0) {
-                var deviceName = "";
-                do {
-                    deviceName = memUTF8Safe(deviceNamesPointer);
-                    if (deviceName != null && !deviceName.equals("")) {
-                        devices.add(deviceName);
-                        deviceNamesPointer += deviceName.length() + 1;
-                    }
-                } while (deviceName != null && !deviceName.equals(""));
-            }
-        }
-
-        return devices;
     }
 }

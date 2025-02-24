@@ -25,20 +25,6 @@ public class ConfigScreen implements ModMenuApi {
             final var data = Config.getData();
 
             final var settings = builder.getOrCreateCategory(Text.translatable("openalmc.config.category"));
-            {
-                final var deviceDropdownMenu = entryBuilder.startDropdownMenu(
-                        Text.translatable("openalmc.config.devices"),
-                        DropdownMenuBuilder.TopCellElementBuilder.of("".equals(data.DeviceName) ? Config.getDevices().get(0) : data.DeviceName, Function.identity()),
-                        DropdownMenuBuilder.CellCreatorBuilder.of()
-                )
-                        .requireRestart()
-                        .setDefaultValue(Config.getDevices().get(0))
-                        .setSelections(Config.getDevices())
-                        .setSaveConsumer(device -> data.DeviceName = device);
-
-                settings.addEntry(deviceDropdownMenu.build());
-            }
-
             settings.addEntry(entryBuilder.startIntField(Text.translatable("openalmc.config.frequency"), data.Frequency)
                     .setDefaultValue(48000)
                     .requireRestart()
