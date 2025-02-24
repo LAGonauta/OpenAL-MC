@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.sound.SoundEngine;
 import net.openalmc.OpenALMCMod;
 
+import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
+
 @Mixin(SoundEngine.class)
 public abstract class MixinSoundEngine {
     @ModifyArg(
@@ -36,9 +38,23 @@ public abstract class MixinSoundEngine {
     )
     private void returnFromMethod(CallbackInfo ci) {
         OpenALMCMod.LOGGER.info("Removing extension check");
+
+        var deviceName = "Unknown";
+        var deviceNamePointer = ALC11.nalcGetString(0, ALC11.ALC_ALL_DEVICES_SPECIFIER);
+        if (deviceNamePointer == 0) {
+            deviceNamePointer = ALC10.nalcGetString(0, ALC10.ALC_DEVICE_SPECIFIER);
+        }
+
+        if (deviceNamePointer > 0) {
+            var name = memUTF8Safe(deviceNamePointer);
+            if (name != null && !name.isEmpty()) {
+                deviceName = name;
+            }
+        }
+
         OpenALMCMod.LOGGER.info(
-                "OpenAL initialized on device {}",
-                ((SoundEngine)(Object)this).getCurrentDeviceName()
+                "OpenAL initialized on device \"{}\"",
+                deviceName
         );
         ci.cancel();
     }
