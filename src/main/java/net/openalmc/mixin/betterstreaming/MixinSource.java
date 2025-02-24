@@ -155,7 +155,7 @@ public abstract class MixinSource {
     }
 
     private int bufferData(int bufferId) throws IOException {
-        final var byteBuffer = this.stream.getBuffer(this.bufferSize);
+        final var byteBuffer = this.stream.read(this.bufferSize);
         if (byteBuffer != null && byteBuffer.remaining() > 0) {
             //OpenALMCMod.LOGGER.info("Buffering for " + pointer + " : " + bufferId + ".");
             if (bufferId == 0) {
