@@ -143,7 +143,7 @@ public abstract class MixinSource {
     }
 
     private void enqueueBuffers(final List<Integer> buffers) {
-        if (buffers.size() > 0) {
+        if (!buffers.isEmpty()) {
             var finalBuffers = new int[buffers.size()];
             for (int index = 0, end = buffers.size(); index < end; ++index) {
                 finalBuffers[index] = buffers.get(index);
@@ -155,7 +155,7 @@ public abstract class MixinSource {
     }
 
     private int bufferData(int bufferId) throws IOException {
-        final var byteBuffer = this.stream.getBuffer(this.bufferSize);
+        final var byteBuffer = this.stream.read(this.bufferSize);
         if (byteBuffer != null && byteBuffer.remaining() > 0) {
             //OpenALMCMod.LOGGER.info("Buffering for " + pointer + " : " + bufferId + ".");
             if (bufferId == 0) {

@@ -1,20 +1,16 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
+base {
+	archivesName = project.archives_base_name
+}
+
 repositories {
-	//maven {
-	//	name = 'GrossFabricHacks'
-	//	url = 'https://maven.concern.i.ng/'
-	//}
 	maven {
 		name = 'Cloth Config Maven'
 		url = 'https://maven.shedaniel.me/'
@@ -24,6 +20,8 @@ repositories {
 		url = 'https://maven.terraformersmc.com/releases/'
 	}
 }
+
+loom {}
 
 dependencies {
 	//to change the versions see the gradle.properties file
@@ -36,8 +34,6 @@ dependencies {
 	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_version}") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
-
-	//modImplementation group: 'net.devtech', name: 'grossfabrichacks', version: "${project.grossfabrichacks_version}"
 }
 
 processResources {
@@ -48,13 +44,8 @@ processResources {
 	}
 }
 
-loom {
-	accessWidenerPath = file("src/main/resources/openalmc.accesswidener")
-}
-
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {
@@ -62,11 +53,16 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
 

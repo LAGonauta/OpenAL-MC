@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "OpenAL MC",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Better OpenAL compatibility",
   "authors": [
     "LAGonauta"
   ],
@@ -29,13 +29,11 @@
     "openalmc.mixins.json"
   ],
 
-  "accessWidener" : "openalmc.accesswidener",
-
   "depends": {
-    "fabricloader": ">=0.12.8",
-    "minecraft": ">=1.19"
+    "fabricloader": ">=0.16.0",
+    "minecraft": ">=1.21"
   },
   "suggests": {
-    "modmenu": "3.x"
+    "modmenu": "13.x"
   }
 }

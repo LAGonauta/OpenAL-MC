@@ -4,10 +4,13 @@ import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.text.Text;
 
 import java.util.function.Function;
 
+@Environment(EnvType.CLIENT)
 public class ConfigScreen implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
@@ -25,12 +28,12 @@ public class ConfigScreen implements ModMenuApi {
             {
                 final var deviceDropdownMenu = entryBuilder.startDropdownMenu(
                         Text.translatable("openalmc.config.devices"),
-                        DropdownMenuBuilder.TopCellElementBuilder.of("".equals(data.DeviceName) ? Config.Devices.get(0) : data.DeviceName, Function.identity()),
+                        DropdownMenuBuilder.TopCellElementBuilder.of("".equals(data.DeviceName) ? Config.getDevices().get(0) : data.DeviceName, Function.identity()),
                         DropdownMenuBuilder.CellCreatorBuilder.of()
                 )
                         .requireRestart()
-                        .setDefaultValue(Config.Devices.get(0))
-                        .setSelections(Config.Devices)
+                        .setDefaultValue(Config.getDevices().get(0))
+                        .setSelections(Config.getDevices())
                         .setSaveConsumer(device -> data.DeviceName = device);
 
                 settings.addEntry(deviceDropdownMenu.build());
