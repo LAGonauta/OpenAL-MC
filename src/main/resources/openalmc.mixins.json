@@ -9,6 +9,7 @@
     "compatibility.MixinSoundEngine",
     "compatibility.MixinSource",
     "config.MixinSoundEngine",
+    "config.MixinALC10",
     "doppler.MixinContextAccessor",
     "doppler.MixinSourceAccessor",
     "doppler.listener.MixinSoundSystem",

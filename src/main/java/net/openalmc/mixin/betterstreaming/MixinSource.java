@@ -143,7 +143,7 @@ public abstract class MixinSource {
     }
 
     private void enqueueBuffers(final List<Integer> buffers) {
-        if (buffers.size() > 0) {
+        if (!buffers.isEmpty()) {
             var finalBuffers = new int[buffers.size()];
             for (int index = 0, end = buffers.size(); index < end; ++index) {
                 finalBuffers[index] = buffers.get(index);
