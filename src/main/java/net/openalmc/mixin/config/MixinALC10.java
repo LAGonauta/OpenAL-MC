@@ -19,8 +19,6 @@ import java.nio.charset.StandardCharsets;
 
 @Mixin(ALC10.class)
 public abstract class MixinALC10 {
-    @Shadow @Final public static int ALC_FREQUENCY;
-
     @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true)
     private static IntBuffer customCreateContext(IntBuffer attrList) {
         var data = Config.getData();
