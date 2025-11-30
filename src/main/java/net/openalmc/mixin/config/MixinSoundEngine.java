@@ -1,6 +1,6 @@
 package net.openalmc.mixin.config;
 
-import net.minecraft.client.sound.SoundEngine;
+import com.mojang.blaze3d.audio.Library;
 import net.openalmc.config.Config;
 import net.openalmc.config.ConfigModel;
 import org.lwjgl.openal.AL10;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(SoundEngine.class)
+@Mixin(Library.class)
 public abstract class MixinSoundEngine {
     @Inject(
             method = "init",

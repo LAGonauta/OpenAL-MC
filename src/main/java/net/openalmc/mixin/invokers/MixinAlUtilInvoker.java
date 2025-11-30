@@ -1,13 +1,12 @@
 package net.openalmc.mixin.invokers;
 
+import com.mojang.blaze3d.audio.OpenAlUtil;
 import javax.sound.sampled.AudioFormat;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-import net.minecraft.client.sound.AlUtil;
-
-@Mixin(AlUtil.class)
+@Mixin(OpenAlUtil.class)
 public interface MixinAlUtilInvoker {
     @Invoker("checkErrors")
     static boolean invokeCheckErrors(String sectionName) {

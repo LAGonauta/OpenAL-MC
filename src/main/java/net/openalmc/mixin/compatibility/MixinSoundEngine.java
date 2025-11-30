@@ -5,13 +5,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.sound.SoundEngine;
 import net.openalmc.OpenALMCMod;
 
 import static org.lwjgl.system.MemoryUtil.memUTF8Safe;
 
-@Mixin(SoundEngine.class)
+import com.mojang.blaze3d.audio.Library;
+
+@Mixin(Library.class)
 public abstract class MixinSoundEngine {
     @ModifyArg(
             method = "init",

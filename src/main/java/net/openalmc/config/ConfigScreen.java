@@ -6,8 +6,7 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.text.Text;
-
+import net.minecraft.network.chat.Component;
 import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
@@ -17,15 +16,15 @@ public class ConfigScreen implements ModMenuApi {
         return parent -> {
             final var builder = ConfigBuilder.create()
                     .setParentScreen(parent)
-                    .setTitle(Text.translatable("openalmc.config.title"));
+                    .setTitle(Component.translatable("openalmc.config.title"));
             final var entryBuilder = builder.entryBuilder();
 
             builder.setSavingRunnable(Config::saveData);
 
             final var data = Config.getData();
 
-            final var settings = builder.getOrCreateCategory(Text.translatable("openalmc.config.category"));
-            settings.addEntry(entryBuilder.startIntField(Text.translatable("openalmc.config.frequency"), data.Frequency)
+            final var settings = builder.getOrCreateCategory(Component.translatable("openalmc.config.category"));
+            settings.addEntry(entryBuilder.startIntField(Component.translatable("openalmc.config.frequency"), data.Frequency)
                     .setDefaultValue(48000)
                     .requireRestart()
                     .setMin(8000)
@@ -33,7 +32,7 @@ public class ConfigScreen implements ModMenuApi {
                     .setSaveConsumer(newValue -> data.Frequency = newValue).build()
             );
 
-            settings.addEntry(entryBuilder.startIntField(Text.translatable("openalmc.config.maxsends"), data.MaxSends)
+            settings.addEntry(entryBuilder.startIntField(Component.translatable("openalmc.config.maxsends"), data.MaxSends)
                     .setDefaultValue(2)
                     .requireRestart()
                     .setMin(2)
@@ -41,7 +40,7 @@ public class ConfigScreen implements ModMenuApi {
                     .setSaveConsumer(newValue -> data.MaxSends = newValue).build()
             );
 
-            settings.addEntry(entryBuilder.startFloatField(Text.translatable("openalmc.config.dopplerfactor"), data.DopplerFactor)
+            settings.addEntry(entryBuilder.startFloatField(Component.translatable("openalmc.config.dopplerfactor"), data.DopplerFactor)
                     .setDefaultValue(1.0f)
                     .requireRestart()
                     .setMin(0.1f)

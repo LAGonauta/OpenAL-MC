@@ -1,8 +1,8 @@
 package net.openalmc.mixin.betterstreaming;
 
 import com.google.common.collect.Sets;
-import net.minecraft.client.sound.AudioStream;
-import net.minecraft.client.sound.Source;
+import com.mojang.blaze3d.audio.Channel;
+import net.minecraft.client.sounds.AudioStream;
 import net.openalmc.OpenALMCMod;
 import net.openalmc.mixin.invokers.MixinAlUtilInvoker;
 import org.lwjgl.openal.AL10;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Mixin(Source.class)
+@Mixin(Channel.class)
 public abstract class MixinSource {
     @Shadow
     @Final

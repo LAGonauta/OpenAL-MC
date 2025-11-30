@@ -1,12 +1,12 @@
 package net.openalmc.mixin.compatibility;
 
-import net.minecraft.client.sound.Source;
+import com.mojang.blaze3d.audio.Channel;
 import org.lwjgl.openal.AL10;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(Source.class)
+@Mixin(Channel.class)
 public class MixinSource {
     @Redirect(
             method = "Lnet/minecraft/client/sound/Source;setAttenuation(F)V",
