@@ -17,13 +17,13 @@ import java.nio.IntBuffer;
 
 @Mixin(ALC10.class)
 public abstract class MixinALC10 {
-    @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
     private static IntBuffer customCreateContext(IntBuffer attrList) {
         return IntBuffer.wrap(buildAttrList());
     }
 
 
-    @ModifyVariable(method = "alcCreateContext(J[I)J", remap = false, at = @At("HEAD"), argsOnly = true)
+    @ModifyVariable(method = "alcCreateContext(J[I)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
     private static int[] modifyAttrList(int[] attrList) {
         return buildAttrList();
     }

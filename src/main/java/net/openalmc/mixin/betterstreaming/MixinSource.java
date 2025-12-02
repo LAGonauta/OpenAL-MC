@@ -24,16 +24,16 @@ import java.util.Set;
 public abstract class MixinSource {
     @Shadow
     @Final
-    private int pointer;
+    private int source;
 
     @Shadow
     private AudioStream stream;
 
     @Shadow
-    private int bufferSize = 16384;
+    private int streamingBufferSize = 16384;
 
     @Shadow
-    private static int getBufferSize(AudioFormat format, int time) {
+    private static int calculateBufferSize(AudioFormat format, int time) {
         throw new AssertionError("Should not be called");
     }
 
@@ -45,22 +45,22 @@ public abstract class MixinSource {
         aborted = true;
     }
 
-    @Inject(method = "close", at = @At("RETURN"))
-    private void onClose(CallbackInfo ci) {
+    @Inject(method = "destroy", at = @At("RETURN"))
+    private void onDestroy(CallbackInfo ci) {
         for(int buffer : buffered) {
             if (AL10.alIsBuffer(buffer)) {
                 AL10.alDeleteBuffers(buffer);
             }
-            MixinAlUtilInvoker.invokeCheckErrors("Deleting stream buffer");
+            MixinAlUtilInvoker.invokeCheckALError("Deleting stream buffer");
         }
     }
 
     @Inject(
-            method = "isStopped",
+            method = "stopped",
             at = @At("RETURN"),
             cancellable = true
     )
-    private void onIsStopped(CallbackInfoReturnable<Boolean> cir) {
+    private void onStopped(CallbackInfoReturnable<Boolean> cir) {
         if (aborted && !cir.getReturnValue()) {
             cir.setReturnValue(aborted);
         }
@@ -71,14 +71,14 @@ public abstract class MixinSource {
      * @reason Reuse buffers on streaming
      */
     @Inject(
-            method = "setStream",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sound/Source;read(I)V"),
+            method = "attachBufferStream",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/audio/Channel;pumpBuffers(I)V"),
             cancellable = true
     )
     public void setStream(AudioStream stream, CallbackInfo ci) {
         this.stream = stream;
         AudioFormat audioFormat = stream.getFormat();
-        this.bufferSize = getBufferSize(audioFormat, 1);
+        this.streamingBufferSize = calculateBufferSize(audioFormat, 1);
 
         int numBuffers = 4;
         if (this.stream != null) {
@@ -102,14 +102,14 @@ public abstract class MixinSource {
      * @author LAGonauta
      * @reason Reuse buffer on streaming
      */
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "updateStream", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
         if (this.stream != null) {
-            int processedBuffers = AL10.alGetSourcei(this.pointer, AL10.AL_BUFFERS_PROCESSED);
+            int processedBuffers = AL10.alGetSourcei(this.source, AL10.AL_BUFFERS_PROCESSED);
             if (processedBuffers > 0) {
                 final var bufferIds = new int[processedBuffers];
-                AL10.alSourceUnqueueBuffers(this.pointer, bufferIds);
-                MixinAlUtilInvoker.invokeCheckErrors("Unqueue buffers");
+                AL10.alSourceUnqueueBuffers(this.source, bufferIds);
+                MixinAlUtilInvoker.invokeCheckALError("Unqueue buffers");
 
                 try {
                     List<Integer> buffers = new ArrayList<>(processedBuffers);
@@ -126,14 +126,14 @@ public abstract class MixinSource {
                     e.printStackTrace();
                 }
             } else {
-                int state = AL10.alGetSourcei(this.pointer, AL10.AL_SOURCE_STATE);
+                int state = AL10.alGetSourcei(this.source, AL10.AL_SOURCE_STATE);
                 if (state == AL10.AL_INITIAL) {
-                    int queued = AL10.alGetSourcei(this.pointer, AL10.AL_BUFFERS_QUEUED);
+                    int queued = AL10.alGetSourcei(this.source, AL10.AL_BUFFERS_QUEUED);
                     if (queued > 0) {
-                        OpenALMCMod.LOGGER.info("Source overrun: " + this.pointer + ". It had " + queued + " buffers. New state: " + AL10.alGetSourcei(this.pointer, AL10.AL_SOURCE_STATE));
-                        AL10.alSourcePlay(this.pointer);
+                        OpenALMCMod.LOGGER.info("Source overrun: " + this.source + ". It had " + queued + " buffers. New state: " + AL10.alGetSourcei(this.source, AL10.AL_SOURCE_STATE));
+                        AL10.alSourcePlay(this.source);
                     } else {
-                        AL10.alSourceStop(this.pointer);
+                        AL10.alSourceStop(this.source);
                         aborted = true;
                     }
                 }
@@ -149,27 +149,27 @@ public abstract class MixinSource {
                 finalBuffers[index] = buffers.get(index);
             }
             buffered.addAll(buffers);
-            AL10.alSourceQueueBuffers(this.pointer, finalBuffers);
-            MixinAlUtilInvoker.invokeCheckErrors("Enqueuing buffers");
+            AL10.alSourceQueueBuffers(this.source, finalBuffers);
+            MixinAlUtilInvoker.invokeCheckALError("Enqueuing buffers");
         }
     }
 
     private int bufferData(int bufferId) throws IOException {
-        final var byteBuffer = this.stream.read(this.bufferSize);
+        final var byteBuffer = this.stream.read(this.streamingBufferSize);
         if (byteBuffer != null && byteBuffer.remaining() > 0) {
             //OpenALMCMod.LOGGER.info("Buffering for " + pointer + " : " + bufferId + ".");
             if (bufferId == 0) {
                 bufferId = AL10.alGenBuffers();
             }
 
-            if (MixinAlUtilInvoker.invokeCheckErrors("Creating buffer")) {
+            if (MixinAlUtilInvoker.invokeCheckALError("Creating buffer")) {
                 return 0;
             }
 
             final var format = this.stream.getFormat();
-            final var formatId = MixinAlUtilInvoker.invokeGetFormatId(format);
+            final var formatId = MixinAlUtilInvoker.invokeAudioFormatToOpenAl(format);
             AL10.alBufferData(bufferId, formatId, byteBuffer, (int) format.getSampleRate());
-            MixinAlUtilInvoker.invokeCheckErrors("Assigning buffer data");
+            MixinAlUtilInvoker.invokeCheckALError("Assigning buffer data");
 
             return bufferId;
         }

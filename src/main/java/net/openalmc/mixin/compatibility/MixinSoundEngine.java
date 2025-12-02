@@ -15,7 +15,7 @@ import com.mojang.blaze3d.audio.Library;
 public abstract class MixinSoundEngine {
     @ModifyArg(
             method = "init",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(III)I", ordinal = 1),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(III)I", ordinal = 1),
             index = 2
     )
     private int modifyMaxSources(int maxSources) {
@@ -33,7 +33,7 @@ public abstract class MixinSoundEngine {
     // Do not check for extensions
     @Inject(
             method = "init",
-            at = @At(value = "INVOKE", shift = Shift.AFTER, target = "Lnet/minecraft/client/sound/AlUtil;checkErrors(Ljava/lang/String;)Z"),
+            at = @At(value = "INVOKE", shift = Shift.AFTER, target = "Lcom/mojang/blaze3d/audio/OpenAlUtil;checkALError(Ljava/lang/String;)Z"),
             cancellable = true
     )
     private void returnFromMethod(CallbackInfo ci) {

@@ -8,18 +8,18 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(OpenAlUtil.class)
 public interface MixinAlUtilInvoker {
-    @Invoker("checkErrors")
-    static boolean invokeCheckErrors(String sectionName) {
+    @Invoker("checkALError")
+    static boolean invokeCheckALError(String sectionName) {
         throw new RuntimeException("Mixin invoker body somehow got called, this should never happen");
     }
 
-    @Invoker("checkAlcErrors")
-    static boolean invokeCheckAlcErrors(long devicePointer, String sectionName) {
+    @Invoker("checkALCError")
+    static boolean invokeCheckALCError(long devicePointer, String sectionName) {
         throw new RuntimeException("Mixin invoker body somehow got called, this should never happen");
     }
 
-    @Invoker("getFormatId")
-    static int invokeGetFormatId(AudioFormat devicePointer) {
+    @Invoker("audioFormatToOpenAl")
+    static int invokeAudioFormatToOpenAl(AudioFormat devicePointer) {
         throw new RuntimeException("Mixin invoker body somehow got called, this should never happen");
     }
 }

@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Channel.class)
 public interface MixinSourceAccessor {
-    @Accessor("pointer")
+    @Accessor("source")
     int getPointer();
 }

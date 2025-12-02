@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Library.class)
 public interface MixinContextAccessor {
-    @Accessor("contextPointer")
+    @Accessor("context")
     long getContextPointer();
 }

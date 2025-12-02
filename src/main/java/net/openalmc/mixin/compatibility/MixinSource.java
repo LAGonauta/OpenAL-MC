@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(Channel.class)
 public class MixinSource {
     @Redirect(
-            method = "Lnet/minecraft/client/sound/Source;setAttenuation(F)V",
+            method = "Lcom/mojang/blaze3d/audio/Channel;linearAttenuation(F)V",
             at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/AL10;alSourcei(III)V", ordinal = 0, remap = false)
     )
     private void disableSetSourceDistanceModel(int source, int param, int value) {
@@ -17,7 +17,7 @@ public class MixinSource {
     }
 
     @Redirect(
-            method = "Lnet/minecraft/client/sound/Source;disableAttenuation()V",
+            method = "Lcom/mojang/blaze3d/audio/Channel;disableAttenuation()V",
             at = @At(value = "INVOKE", target = "Lorg/lwjgl/openal/AL10;alSourcei(III)V", remap = false)
     )
     private void disableAttenuation(int source, int param, int value) {
