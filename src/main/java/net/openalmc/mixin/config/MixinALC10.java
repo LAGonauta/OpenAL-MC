@@ -19,12 +19,6 @@ import java.nio.IntBuffer;
 public abstract class MixinALC10 {
     @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
     private static IntBuffer customCreateContext(IntBuffer attrList) {
-        return IntBuffer.wrap(buildAttrList());
-    }
-
-
-    @ModifyVariable(method = "alcCreateContext(J[I)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
-    private static int[] modifyAttrList(int[] attrList) {
         return buildAttrList();
     }
 
@@ -53,7 +47,7 @@ public abstract class MixinALC10 {
     }
 
     @Unique
-    private static int[] buildAttrList() {
+    private static IntBuffer buildAttrList() {
         var data = Config.getData();
 
         var maxSends = data.MaxSends;
@@ -61,7 +55,12 @@ public abstract class MixinALC10 {
             OpenALMCMod.LOGGER.info("Sound Physics Remastered is loaded. Setting Max Sends to 4");
             maxSends = 4;
         }
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(6 * 4);
+        IntBuffer intBuffer = byteBuffer.asIntBuffer();
+        intBuffer.put(ALC10.ALC_FREQUENCY).put(data.Frequency);
+        intBuffer.put(EXTEfx.ALC_MAX_AUXILIARY_SENDS).put(maxSends);
+        intBuffer.put(0).put(0).flip();
 
-        return new int[]{ ALC10.ALC_FREQUENCY, data.Frequency, EXTEfx.ALC_MAX_AUXILIARY_SENDS, maxSends, 0, 0 };
+        return intBuffer;
     }
 }
