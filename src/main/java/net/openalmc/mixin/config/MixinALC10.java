@@ -19,6 +19,7 @@ import java.nio.IntBuffer;
 public abstract class MixinALC10 {
     @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
     private static IntBuffer customCreateContext(IntBuffer attrList) {
+        OpenALMCMod.LOGGER.info("Modifying attrList (IntBuffer)");
         return buildAttrList();
     }
 
