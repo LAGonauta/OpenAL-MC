@@ -17,12 +17,6 @@ import java.nio.IntBuffer;
 
 @Mixin(ALC10.class)
 public abstract class MixinALC10 {
-    @ModifyVariable(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"), argsOnly = true, name = "arg2")
-    private static IntBuffer customCreateContext(IntBuffer attrList) {
-        OpenALMCMod.LOGGER.info("Modifying attrList (IntBuffer)");
-        return buildAttrList();
-    }
-
     @Inject(method = "alcCreateContext(JLjava/nio/IntBuffer;)J", remap = false, at = @At("HEAD"))
     private static void resetErrorBeforeCreateContextIntBuffer(long deviceHandle, IntBuffer attrList, CallbackInfoReturnable<Long> cir) {
         var err = ALC10.alcGetError(deviceHandle);
@@ -45,23 +39,5 @@ public abstract class MixinALC10 {
     private static void resetErrorBeforeCreateDeviceByteBuffer(ByteBuffer deviceSpecifier, CallbackInfoReturnable<Long> cir) {
         var err = ALC10.alcGetError(0);
         OpenALMCMod.LOGGER.info("Error before creating device: {}", err);
-    }
-
-    @Unique
-    private static IntBuffer buildAttrList() {
-        var data = Config.getData();
-
-        var maxSends = data.MaxSends;
-        if (FabricLoader.getInstance().isModLoaded("sound_physics_remastered")) {
-            OpenALMCMod.LOGGER.info("Sound Physics Remastered is loaded. Setting Max Sends to 4");
-            maxSends = 4;
-        }
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(6 * 4);
-        IntBuffer intBuffer = byteBuffer.asIntBuffer();
-        intBuffer.put(ALC10.ALC_FREQUENCY).put(data.Frequency);
-        intBuffer.put(EXTEfx.ALC_MAX_AUXILIARY_SENDS).put(maxSends);
-        intBuffer.put(0).put(0).flip();
-
-        return intBuffer;
     }
 }

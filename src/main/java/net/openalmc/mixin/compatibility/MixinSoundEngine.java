@@ -2,6 +2,7 @@ package net.openalmc.mixin.compatibility;
 
 import org.lwjgl.openal.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.At.Shift;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -13,6 +14,9 @@ import com.mojang.blaze3d.audio.Library;
 
 @Mixin(Library.class)
 public abstract class MixinSoundEngine {
+    @Shadow
+    private long currentDevice;
+
     @ModifyArg(
             method = "init",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(III)I", ordinal = 1),
@@ -52,9 +56,10 @@ public abstract class MixinSoundEngine {
             }
         }
 
+        var maxAuxSends = ALC10.alcGetInteger(currentDevice, EXTEfx.ALC_MAX_AUXILIARY_SENDS);
         OpenALMCMod.LOGGER.info(
-                "OpenAL initialized on device \"{}\"",
-                deviceName
+                "OpenAL initialized on device \"{}\" with {} max EFX sends",
+                deviceName, maxAuxSends
         );
         ci.cancel();
     }
